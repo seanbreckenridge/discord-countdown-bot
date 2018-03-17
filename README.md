@@ -16,13 +16,15 @@ Requires `pip3 install discord`
 
 Assuming the bot's name is `@countdown`:
 
+__Commands__
+
 `start`: Starts a countdown from the entered numer. e.g. `@countdown start 10`
 
 `stop`: Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`
 
 `help`: Displays this help message. e.g. `@countdown help`
 
-Moderator Commands
+__Moderator Commands__
 
 `allow`: Allows countdowns in a channel. e.g. `@countdown allow general`
 
