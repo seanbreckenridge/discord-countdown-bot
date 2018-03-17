@@ -1,6 +1,6 @@
 # Countdown Bot
 
-A Simple bot that counts down in numeric emojis.
+A simple bot that counts down in numeric emojis.
 
 <img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/count.png" alt="botscreencap" width=275>
 
