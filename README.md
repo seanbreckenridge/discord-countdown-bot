@@ -38,7 +38,7 @@ Moderator Commands
 
 By default, rate (number of times a user can start a countdown) is 5 times every 6 hours.
 
-###### Options
+### Options
 
 _Client Secret_ should be stored in a file `.token`.
 
