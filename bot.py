@@ -1,4 +1,4 @@
-import discord
+from discord import Client
 from asyncio import sleep
 from discord.ext import commands
 import os
@@ -12,25 +12,25 @@ userid = "" # the id of the user who is currently counting down
 rate_limit = {} # stops users from spamming countdowns
 servers = {} # permissions for channels in each server
 
-# load options
+#  load options
 with open('options.json') as options_file:
     options = loads(options_file.read().strip())
-# load token
+#  load token
 with open('.token', 'r') as token_file: # get token from file
     token = token_file.readline().rstrip('\n')
 
-# create folder if it doesn't exist
+#  create folder if it doesn't exist
 create_folder(options['server_folder'])
 
-# populate server/channel permissions
+#  populate server/channel permissions
 servers = populate_permissions(options['server_folder'])
 
-# start clients
-Client = discord.Client()
+#  start clients
+discord_connection = Client()
 client = commands.Bot(command_prefix=commands.when_mentioned)
 client.remove_command('help') # remove default help
 
-# only allows a user to use the countdown 5 times in a 6 hour time farme
+#  only allows a user to use the countdown 5 times in a 6 hour time farme
 COUNTDOWN_MAX = options['countdown_max']
 COUNTDOWN_MIN = options['countdown_min']
 X_TIMES = options['x_times']
@@ -40,15 +40,18 @@ EVERY_X_SECONDS = EVERY_X_HOURS * 60 * 60
 num_emoji = options['num_emoji'] # list with emoji 0 - 9
 go_messages = options['go_messages'] # list with go! messages
 
+
 def go():
     """returns a random 'go!' message"""
     return choice(go_messages)
+
 
 def remove_outdated_limits():
     """Remove outdated rate limits on users."""
     now = time()
     for user in rate_limit: # for each user
         rate_limit[user] = [old_time for old_time in rate_limit[user] if int(now - old_time) < EVERY_X_SECONDS]
+
 
 def check_rate_limit(uid):
     """Check if user is allowed to print a countdown"""
@@ -62,9 +65,11 @@ def check_rate_limit(uid):
             rate_limit[uid] = [time()]
         return True # approved
 
+
 @client.event
 async def on_ready():
     print("Ready!")
+
 
 @client.command(pass_context=True)
 async def start(ctx, *count_from):
@@ -98,6 +103,7 @@ async def start(ctx, *count_from):
     else:
         await client.send_message(ctx.message.channel, "Why you need so many counters :thinking:")
 
+
 async def count(num, uid, channel):
     """Countdown; print messages to the channel while command isn't stopped/halted"""
     global is_counting
@@ -112,12 +118,14 @@ async def count(num, uid, channel):
     await sleep(1)
     await client.send_message(channel, go())
 
+
 @client.command(pass_context=True)
 async def stop(ctx):
     """Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`"""
     global is_counting
     if ctx.message.author.id == userid: # if user which called stop is the one who started the current countdown
         is_counting = False
+
 
 @client.command()
 @commands.has_permissions(kick_members=True)
@@ -147,6 +155,7 @@ async def allow(ctx, channel_name):
     else:
         await client.send_message(ctx.message.channel, "I'm already allowed in {}.".format(channel_name))
 
+
 @client.command(pass_context=True)
 @commands.has_permissions(kick_members=True)
 async def disallow(ctx, channel_name):
@@ -157,7 +166,7 @@ async def disallow(ctx, channel_name):
         return
     if channel_name in servers[this_server]: # if that channel is allowed
         servers[this_server].remove(channel_name) # remove from list
-        # remove from file
+        #  remove from file
         open(os.path.join(options['server_folder'], this_server), 'a').close() # make sure file exists
         with open(os.path.join(options['server_folder'], this_server)) as f:
             allowed_channels = f.readlines()
@@ -169,6 +178,7 @@ async def disallow(ctx, channel_name):
     else:
         await client.send_message(ctx.message.channel, "I'm already not allowed in `{}`".format(channel_name))
 
+
 @client.command(pass_context=True)
 @commands.has_permissions(kick_members=True)
 async def list_channels(ctx):
@@ -178,6 +188,7 @@ async def list_channels(ctx):
         await client.send_message(ctx.message.channel, "I'm allowed to run in {}.".format(readable_channel_list(this_server, servers)))
     else:
         await client.send_message(ctx.message.channel, "I'm not allowed to run in any channels on {}.".format(this_server))
+
 
 @client.command(pass_context=True)
 @commands.has_permissions(kick_members=True)
@@ -189,6 +200,7 @@ async def purge_channel_list(ctx):
     open(os.path.join(options['server_folder'], this_server), 'w').close() # deletes file that represents this server
     await client.send_message(ctx.message.channel, "Purged list of allowed channels.")
 
+
 @client.command(pass_context=True)
 @commands.has_permissions(kick_members=True)
 async def reset_rate_limits(ctx):
@@ -196,6 +208,7 @@ async def reset_rate_limits(ctx):
     global rate_limit
     rate_limit = {}
     await client.send_message(ctx.message.channel, "Reset all limits successfully.")
+
 
 @client.command(pass_context=True)
 async def help(ctx):
@@ -207,5 +220,6 @@ async def help(ctx):
                     "\n\n*Moderator Commands*\n\n" + "\n\n".join(['`{0}`: {1}'.format(f.name, f.short_doc) for f in moderator_funcs]) + \
                     "\nRate is currently {} time(s) every {} hours.".format(X_TIMES, EVERY_X_HOURS)
         await client.send_message(ctx.message.channel, help_text)
+
 
 client.run(token)
