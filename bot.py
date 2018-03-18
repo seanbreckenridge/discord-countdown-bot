@@ -75,7 +75,8 @@ async def on_ready():
 async def start(ctx, *count_from):
     """Starts a countdown from the entered numer. e.g. `@countdown start 10`"""
     global is_counting
-    this_channel, this_server = get_channel_and_server(ctx)
+    this_channel = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
     if not check_if_allowed_channel(ctx, servers): # not allowed to print in this channel
         return
     if is_counting: # if already counting somewhere else, don't start
@@ -139,15 +140,15 @@ async def halt():
 @commands.has_permissions(kick_members=True)
 async def allow(ctx, channel_name):
     """Allows countdowns in a channel. e.g. `@countdown allow general`"""
-    this_channel, this_server = get_channel_and_server(ctx)
-    channels_on_this_server = get_channel_names(ctx)
-    if this_server not in servers: # if server is not known
-        open(os.path.join(options['server_folder'], this_server), 'a').close() # create file
-        servers[this_server] = []
-    if channel_name not in servers[this_server]: # if channel not already allowed
-        if channel_name in channels_on_this_server: # if this channel exists
-            servers[this_server].append(channel_name) # add it to the list
-            with open(os.path.join(options['server_folder'], this_server), 'a') as f:
+    this_channel = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
+    if server_id not in servers: # if server is not known
+        open(os.path.join(options['server_folder'], server_id), 'a').close() # create file
+        servers[server_id] = []
+    if channel_name not in servers[server_id]: # if channel not already allowed
+        if channel_name in get_channel_names(ctx): # if this channel exists
+            servers[server_id].append(channel_name) # add it to the list
+            with open(os.path.join(options['server_folder'], server_id), 'a') as f:
                 f.write("{}\n".format(channel_name)) # append it into the file
             await client.send_message(ctx.message.channel, "Successfully added `{}`.".format(channel_name))
         else:
@@ -160,17 +161,18 @@ async def allow(ctx, channel_name):
 @commands.has_permissions(kick_members=True)
 async def disallow(ctx, channel_name):
     """Disallows countdown in a channel. All channels are disallowed by default. e.g. `@countdown disallow general`"""
-    this_channel, this_server = get_channel_and_server(ctx)
+    this_channel = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
     if channel_name not in get_channel_names(ctx): # if that channel doesn't exist
         await client.send_message(ctx.message.channel, "Couldn't find the channel `{}`.".format(channel_name))
         return
-    if channel_name in servers[this_server]: # if that channel is allowed
-        servers[this_server].remove(channel_name) # remove from list
+    if channel_name in servers[server_id]: # if that channel is allowed
+        servers[server_id].remove(channel_name) # remove from list
         #  remove from file
-        open(os.path.join(options['server_folder'], this_server), 'a').close() # make sure file exists
-        with open(os.path.join(options['server_folder'], this_server)) as f:
+        open(os.path.join(options['server_folder'], server_id), 'a').close() # make sure file exists
+        with open(os.path.join(options['server_folder'], server_id), 'r') as f:
             allowed_channels = f.readlines()
-        with open(os.path.join(options['server_folder'], this_server), 'w') as f:
+        with open(os.path.join(options['server_folder'], server_id), 'w') as f:
             for c in allowed_channels:
                 if c != "{}\n".format(channel_name): # remove disallowed channel
                     f.write(c)
@@ -183,21 +185,23 @@ async def disallow(ctx, channel_name):
 @commands.has_permissions(kick_members=True)
 async def list_channels(ctx):
     """Tells you which channels on this server countdowns are allowed in. e.g. `@countdown list_channels`"""
-    this_channel, this_server = get_channel_and_server(ctx)
-    if this_server in servers and len(servers[this_server]) > 0:
-        await client.send_message(ctx.message.channel, "I'm allowed to run in {}.".format(readable_channel_list(this_server, servers)))
+    this_channel = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
+    if server_id in servers and len(servers[server_id]) > 0:
+        await client.send_message(ctx.message.channel, "I'm allowed to run in {}.".format(readable_channel_list(server_id, servers)))
     else:
-        await client.send_message(ctx.message.channel, "I'm not allowed to run in any channels on {}.".format(this_server))
+        await client.send_message(ctx.message.channel, "I'm not allowed to run in any channels on {}.".format(ctx.message.server))
 
 
 @client.command(pass_context=True)
 @commands.has_permissions(kick_members=True)
 async def purge_channel_list(ctx):
     """Purges the list of allowed channels. e.g. `@countdown purge_channel_list`"""
-    this_channel, this_server = get_channel_and_server(ctx)
-    if this_server in servers:
-        servers[this_server] = [] # clears the list of channels
-    open(os.path.join(options['server_folder'], this_server), 'w').close() # deletes file that represents this server
+    this_channel = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
+    if server_id in servers:
+        servers[server_id] = [] # clears the list of channels
+    open(os.path.join(options['server_folder'], server_id), 'w').close() # deletes file that represents this server
     await client.send_message(ctx.message.channel, "Purged list of allowed channels.")
 
 

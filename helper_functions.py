@@ -21,10 +21,13 @@ def populate_permissions(dir):
     return servers
 
 
-def get_channel_and_server(ctx):
-    """Returns string representations of channel, server"""
-    return str(ctx.message.channel), str(ctx.message.server)
+def get_channel_name(ctx):
+    """Returns channel name of context"""
+    return str(ctx.message.channel)
 
+def get_server_id(ctx):
+    """Returns the ID of this server as a string."""
+    return str(ctx.message.server.id)
 
 def get_channel_names(ctx):
     """Returns names of all channels in this server"""
@@ -33,16 +36,17 @@ def get_channel_names(ctx):
 
 def check_if_allowed_channel(ctx, servers):
     """Checks if countdown bot is allowed to count in this server"""
-    chan, serv = get_channel_and_server(ctx)
-    if serv in servers:
-        if chan in servers[serv]:
+    chan = get_channel_name(ctx)
+    server_id = get_server_id(ctx)
+    if server_id in servers:
+        if chan in servers[server_id]:
             return True
     return False
 
 
-def readable_channel_list(server_name, servers):
+def readable_channel_list(server_id, servers):
     """Returns a readable list of channels to be printed for list_channels"""
-    channel_names = servers[server_name]
+    channel_names = servers[server_id]
     channel_names = list(map(lambda x: "`{}`".format(x), channel_names))
     if len(channel_names) > 1:
         return ", ".join(channel_names[:-1]) + ", and " + channel_names[-1]
