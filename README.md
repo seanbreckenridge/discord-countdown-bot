@@ -18,7 +18,7 @@ Assuming the bot's name is `@countdown`:
 
 __Commands__
 
-`start`: Starts a countdown from the entered numer. e.g. `@countdown start 10`
+`start`: Starts a countdown from the entered number. e.g. `@countdown start 10`
 
 `stop`: Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`
 
