@@ -42,7 +42,7 @@ By default, rate (number of times a user can start a countdown) is 5 times every
 
 ### Options
 
-_Client Secret_ should be stored in a file named `.token`.
+_Token_ should be stored in a file named `.token`.
 
 Min and Max for countdown values can be edited in `options.json`: `countdown_min` and `countdown_max`.
 
