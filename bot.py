@@ -73,7 +73,7 @@ async def on_ready():
 
 @client.command(pass_context=True)
 async def start(ctx, *count_from):
-    """Starts a countdown from the entered numer. e.g. `@countdown start 10`"""
+    """Starts a countdown from the entered number. e.g. `@countdown start 10`"""
     global is_counting
     this_channel = get_channel_name(ctx)
     server_id = get_server_id(ctx)
