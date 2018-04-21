@@ -2,15 +2,17 @@ from discord import Client
 from asyncio import sleep
 from discord.ext import commands
 import os
+import re
 from time import time
 from random import choice
 from json import loads
 from helper_functions import *
 
 is_counting = False # if the bot is currently counting down
-userid = "" # the id of the user who is currently counting down
+userid = None # the id of the user who is currently counting down
 rate_limit = {} # stops users from spamming countdowns
 servers = {} # permissions for channels in each server
+bot_self_name = None # the name of the bot
 
 #  load options
 with open('options.json') as options_file:
@@ -25,8 +27,7 @@ create_folder(options['server_folder'])
 #  populate server/channel permissions
 servers = populate_permissions(options['server_folder'])
 
-#  start clients
-discord_connection = Client()
+#  start client
 client = commands.Bot(command_prefix=commands.when_mentioned)
 client.remove_command('help') # remove default help
 
@@ -73,7 +74,13 @@ async def on_ready():
 
 @client.command(pass_context=True)
 async def start(ctx, *count_from):
-    """Starts a countdown from the entered number. e.g. `@countdown start 10`"""
+    """Starts a countdown from the entered number. e.g. `@countdown start 10`/`@countdown 10`"""
+    await do_start(ctx, *count_from)
+
+
+async def do_start(ctx, *count_from):
+    """Counts; function that is called when 'start' is called.
+    To make error handling easier."""
     global is_counting
     this_channel = get_channel_name(ctx)
     server_id = get_server_id(ctx)
@@ -89,7 +96,7 @@ async def start(ctx, *count_from):
     try:
         num = int(count_from)
     except:
-        await client.send_message(ctx.message.channel, "Couldn't interpret {} as a number...".format(count_from))
+        await client.send_message(ctx.message.channel, "Couldn't interpret `{}` as a number...".format(count_from))
         return
     if num > COUNTDOWN_MAX:
         await client.send_message(ctx.message.channel, "{} is too damn high. {} is the maximum.".format(num, COUNTDOWN_MAX))
@@ -103,6 +110,7 @@ async def start(ctx, *count_from):
         is_counting = False
     else:
         await client.send_message(ctx.message.channel, "Why you need so many counters :thinking:")
+
 
 
 async def count(num, uid, channel):
@@ -119,21 +127,24 @@ async def count(num, uid, channel):
     await sleep(1)
     await client.send_message(channel, go())
 
+async def stop_counting():
+    """Stops the countdown."""
+    global is_counting
+    is_counting = False
+
 
 @client.command(pass_context=True)
 async def stop(ctx):
     """Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`"""
-    global is_counting
     if ctx.message.author.id == userid: # if user which called stop is the one who started the current countdown
-        is_counting = False
+        stop_counting()
 
 
 @client.command()
 @commands.has_permissions(kick_members=True)
 async def halt():
     """Stops the countdown disregarding who started it. e.g. `@countdown halt`"""
-    global is_counting
-    is_counting = False
+    await stop_counting()
 
 
 @client.command(pass_context=True)
@@ -224,6 +235,37 @@ async def help(ctx):
                     "\n\n*Moderator Commands*\n\n" + "\n\n".join(['`{0}`: {1}'.format(f.name, f.short_doc) for f in moderator_funcs]) + \
                     "\nRate is currently {} time(s) every {} hours.".format(X_TIMES, EVERY_X_HOURS)
         await client.send_message(ctx.message.channel, help_text)
+
+
+
+
+@client.command(pass_context=True)
+@client.event
+async def on_command_error(error, ctx):
+    """Prints errors if it's allowed; parses through errors to start/stop if possible."""
+    if check_if_allowed_channel(ctx, servers):
+        message = ctx.message.content.split(">", maxsplit=1)[1]
+        lowered = message.lower().strip()
+        message_parts = re.split("\s+", lowered)
+        if message_parts[0] == 'start':
+            if len(message_parts) < 2: # if no number was provided
+                await do_start(ctx, 10)
+                return
+            else:
+                await do_start(ctx, message_parts[1])
+                return
+        elif message_parts[0] == 'stop':
+            if ctx.message.author.id == userid:
+                await stop_counting()
+                return
+        else: # check is user tried to start a countdown without 'start'.
+            try:
+                await do_start(ctx, int(message_parts[0]))
+                return
+            except:
+                await client.send_message(ctx.message.channel, "Not sure what you mean by '{}'.".format(message.strip()))
+    else:
+        print("Not allowed to print errors in {}: {}".format(str(ctx.message.channel), str(error)))
 
 
 client.run(token)
