@@ -20,7 +20,7 @@ __Commands__
 
 `start`: Starts a countdown from the entered number. e.g. `@countdown start 10`
 
-You can also do `@countdown 10`, which implies `countdown start 10`.
+You can also do `@countdown 10`, which implies `@countdown start 10`.
 
 `stop`: Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`
 
