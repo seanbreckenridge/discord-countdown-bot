@@ -137,7 +137,7 @@ async def stop_counting():
 async def stop(ctx):
     """Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`"""
     if ctx.message.author.id == userid: # if user which called stop is the one who started the current countdown
-        stop_counting()
+        await stop_counting()
 
 
 @client.command()
