@@ -8,7 +8,7 @@ A simple bot that counts down in numeric emojis.
 
 Tested in `python 3.5.3` and `3.6.4`.
 
-Requires `pip3 install discord`
+Requires `pip3 install --user discord`
 
 ### Usage:
 
