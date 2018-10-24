@@ -8,7 +8,7 @@ A simple bot that counts down in numeric emojis.
 
 Tested in `python 3.5.3` and `3.6.4`.
 
-Requires `pip3 install --user discord`
+Requires `pip3 install --user discord pyyaml asyncio`
 
 ### Usage:
 
@@ -44,7 +44,6 @@ By default, rate (number of times a user can start a countdown) is 5 times every
 
 ### Options
 
-_Token_ should be stored in a file named `.token`.
+_Token_ should be stored in a file named `.token` in the root directory.
 
 Min and Max for countdown values can be edited in `options.json`: `countdown_min` and `countdown_max`.
-

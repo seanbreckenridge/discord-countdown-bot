@@ -35,7 +35,7 @@ def get_channel_names(ctx):
 
 
 def check_if_allowed_channel(ctx, servers):
-    """Checks if countdown bot is allowed to count in this server"""
+    """Checks if countdown bot is allowed to count/print wals of text in this channel"""
     chan = get_channel_name(ctx)
     server_id = get_server_id(ctx)
     if server_id in servers:
