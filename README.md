@@ -44,6 +44,8 @@ By default, rate (number of times a user can start a countdown) is 5 times every
 
 ### Options
 
+This bot requires very basic permissions when creating an bot account. Read Text/See Voice Channels, Send Messages, and maybe Embed Links, Attach Files, and Add Reactions for possible future updates.
+
 _Token_ should be stored in a file named `.token` in the root directory.
 
-Min and Max for countdown values can be edited in `options.json`: `countdown_min` and `countdown_max`.
+Min and Max for countdown values can be edited in `config.yaml`: `countdown_min` and `countdown_max`.
