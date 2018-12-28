@@ -1,8 +1,8 @@
 .token
-*.DS_Store
+**/.DS_Store
 /servers/
 *~
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**.py[cod]
+**$py.class
 
