@@ -4,11 +4,29 @@ A simple bot that counts down in numeric emojis.
 
 <img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/count.png" alt="botscreencap" width=275>
 
-### Requirements:
+### Installation
 
-Tested in `python 3.5.3` and `3.6.4`.
+This bot requires very basic permissions when creating an bot account. Just 'Send Messages' is fine, this can be updated later.
 
-Requires `pip3 install --user discord pyyaml asyncio`
+If you're not on python 3.6, use [`pyenv`](https://github.com/pyenv/pyenv) to install another version of python:
+
+`pyenv install 3.6.8`
+`pipenv --python ~/.pyenv/versions/3.6.8/bin/python3.6`
+
+This uses [`pipenv`](https://github.com/pypa/pipenv) to manage the environment; after:
+
+```
+git clone https://github.com/seanbreckenridge/discord-countdown-bot
+cd discord-countdown-bot
+```
+
+... run `pipenv install` to create the virtual environment, and `pipenv shell` to enter it.
+
+Requirements are listed in the [`Pipfile`](./Pipfile).
+
+_Token_ should be stored in a file named `token.json` in the root directory. See token.json.dist as an example.
+
+Additional options can be configured in the [`config.yaml`](./config.yaml) file. (e.g. `countdown_min` and `countdown_min` for the allowed min/max countdown ranges.)
 
 ### Usage:
 
@@ -41,11 +59,3 @@ __Moderator Commands__
 `reset_rate_limits`: Resets rate limits for all users. e.g. `@countdown reset_rate_limits`
 
 By default, rate (number of times a user can start a countdown) is 5 times every 6 hours.
-
-### Options
-
-This bot requires very basic permissions when creating an bot account. Read Text/See Voice Channels, Send Messages, and maybe Embed Links, Attach Files, and Add Reactions for possible future updates.
-
-_Token_ should be stored in a file named `.token` in the root directory.
-
-Min and Max for countdown values can be edited in `config.yaml`: `countdown_min` and `countdown_max`.

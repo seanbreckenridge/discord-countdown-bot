@@ -1,1 +1,5 @@
-{"countdown_min": 3, "x_times": 5, "every_x_hours": 6, "countdown_max": 15, "server_folder": "servers/", "go_messages": [":regional_indicator_g: :regional_indicator_o: :exclamation:", ":goat:", ":space_invader:", ":crossed_swords:", ":movie_camera:"], "num_emoji": [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"]}
+countdown_min: 3
+countdown_max: 15
+x_times: 5
+every_x_hours: 6
+go_messages: [":regional_indicator_g: :regional_indicator_o: :exclamation:", ":goat:", ":space_invader:", ":crossed_swords:", ":movie_camera:"]

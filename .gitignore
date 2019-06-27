@@ -1,8 +1,7 @@
-.token
+token.json
 **/.DS_Store
-/servers/
+server.json
 *~
 **/__pycache__/
 **.py[cod]
 **$py.class
-
