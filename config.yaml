@@ -1,5 +1,0 @@
-countdown_min: 3
-countdown_max: 15
-x_times: 5
-every_x_hours: 6
-server_folder: !!str servers/

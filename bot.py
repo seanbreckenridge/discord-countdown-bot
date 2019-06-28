@@ -1,27 +1,51 @@
 import os
-import re
-from time import time
-from random import choice
+import logging
+import time
+import random
+import traceback
 
-import json
+import yaml
+
 from discord import Client
 from asyncio import sleep
 from discord.ext import commands
 
-from server import *
+logging.basicConfig(level=logging.INFO)
 
-def readable_channel_list(server_id, servers):
-    """Returns a readable list of channels to be printed for list_channels"""
-    channel_names = servers[server_id]
-    channel_names = list(map(lambda x: "`{}`".format(x), channel_names))
-    if len(channel_names) > 1:
-        return ", ".join(channel_names[:-1]) + ", and " + channel_names[-1]
-    else:
-        return str(channel_names[0])
+root_dir = os.path.dirname(os.path.realpath(__file__)) # get directory of bot.py
+token_file = os.path.join(root_dir, 'token.yaml')
+
+COUNTDOWN_MIN = 3
+COUNTDOWN_MAX = 22
+
+# numbers to print countdown with
+num_emoji = [":zero:", ":one:", ":two:", ":three:", ":four:",
+                ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:"]
+
+# messages to print when the countdown is over
+go_messages = [":regional_indicator_g: :regional_indicator_o: :exclamation:",
+                    ":space_invader:", ":crossed_swords:", ":movie_camera:"]
+
+
+#  start bot
+bot = commands.Bot(command_prefix=commands.when_mentioned, pm_help=None,
+                        case_insensitive=False)
+bot.remove_command('help') # remove default help
+bot_name = None
+
+
+def explode(ctx):
+    """Returns useful information from a context"""
+    # server, channel, author, message_text = explode(ctx)
+    return ctx.message.server, ctx.message.channel, ctx.message.author, ctx.message.content
+
+
+async def say(ctx, message):
+    await ctx.message.channel.send(message)
 
 
 def emoji_countdown_list(count_from, num_emoji):
-    """Returns a countdown list in emoji form."""
+    """Returns a countdown list in emoji form to be printed for short countdowns."""
     output_emoji_list = []
     for num in range(count_from, 0, -1):
         s = ""
@@ -29,73 +53,28 @@ def emoji_countdown_list(count_from, num_emoji):
             s += num_emoji[n]
             s += " "
         output_emoji_list.append(s)
+    output_emoji_list.append(random.choice(go_messages))
     return output_emoji_list
-
-root_dir = os.path.dirname(os.path.realpath(__file__)) # get directory of bot.py
-options_file = os.path.join(root_dir, 'options.json')
-server_file = os.path.join(root_dir, 'servers.json')
-token_file = os.path.join(root_dir, 'token.json')
-
-__SERVERS = {}
-
-#  load config
-with open(options_file) as option_f:
-    config = json.load(option_f)
-
-#  start bot
-bot = commands.Bot(command_prefix=commands.when_mentioned, pm_help=None,
-                        case_insensitive=False)
-bot.remove_command('help') # remove default help
-
-# numbers to print countdown with
-num_emoji = [":zero:", ":one:", ":two:", ":three:", ":four:",
-                ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:"]
-
-# messages to print when the countdown is over
-go_messages = [":regional_indicator_g: :regional_indicator_o: :exclamation:", ":man_dancing:",
-                    ":space_invader:", ":crossed_swords:", ":movie_camera:"]
-
-def go():
-    """returns a random 'go!' message"""
-    return choice(go_messages)
-
 
 
 @bot.event
 async def on_ready():
-    for server in bot.guilds:
-        __SERVERS[server.id] = Server(server)
-
-    # load server config
-    if os.path.exists(server_file):
-        with open(server_file) as server_f:
-            server_json = json.load(servers)
-
-            __SERVERS
-            # TODO: update __SERVERS
-            # TODO: use server specific config, allowing more go_messages and configurable limits
-    else: # initialize json file
-
-        
-        for server in __SERVERS:
-
-
-
-
+    # TODO: load in custom go_messages
+    global bot_name
+    bot_name = bot.user.name
     print("Ready!")
 
 
 @bot.command(pass_context=True)
 async def start(ctx, *count_from):
-    """Starts a countdown from the entered number. e.g. `@countdown start 10`/`@countdown 10`"""
+    """Starts a countdown from the entered number, assuming you have the counter role"""
     await do_start(ctx, *count_from)
 
 
 async def do_start(ctx, *count_from):
-    """Counts; function that is called when 'start' is called.
-    To make error handling easier."""
+    """Counts; function that is called when 'start' is called; to make error handling easier."""
 
-    # check if this channel is allowed
+    # TODO: check if this user is allowed
 
     if len(count_from) == 0:
         count_from = 10 # default time of 10
@@ -104,98 +83,53 @@ async def do_start(ctx, *count_from):
     try:
         num = int(count_from)
     except:
-        await bot.send_message(ctx.message.channel, "Couldn't interpret `{}` as a number...".format(count_from))
+        await say(ctx, "Couldn't interpret `{}` as a number...".format(count_from))
         return
     if num > COUNTDOWN_MAX:
-        await bot.send_message(ctx.message.channel, "{} is too damn high. {} is the maximum.".format(num, COUNTDOWN_MAX))
+        await say(ctx, "{} is too damn high. {} is the maximum.".format(num, COUNTDOWN_MAX))
         return
     elif num < COUNTDOWN_MIN:
-        await bot.send_message(ctx.message.channel, "{} is too damn low. {} is the minimum.".format(num, COUNTDOWN_MIN))
+        await say(ctx, "{} is too damn low. {} is the minimum.".format(num, COUNTDOWN_MIN))
         return
-    if check_rate_limit(ctx.message.author.id): # if this user is allowed to countdown
-        is_counting = True
-        await count(num, ctx.message.author.id, ctx.message.channel)
-        is_counting = False
     else:
-        await bot.send_message(ctx.message.channel, "Why you need so many counters :thinking:")
+        await count(num, ctx.message.author.id, ctx)
 
 
-async def count(num, uid, channel):
+async def count(num, uid, ctx):
     """Countdown; print messages to the channel while command isn't stopped/halted"""
-    global is_counting
-    global userid
-    userid = uid
-    for n in emoji_countdown_list(num, num_emoji):
-        await sleep(1)
-        if is_counting:
-            await bot.send_message(channel, n)
+    # track how long to sleep depending on current API latency
+    send_at = time.time() + 1
+    for i, countdown_message in zip(range(num, -1, -1), emoji_countdown_list(num, num_emoji)):
+        if True:
+            # the 0.2 is a guess; for some reason the last message always seems to get delayed
+            # it may just be an artifact of the API status right now, but leaving this here incase
+            # its a predictable delay
+            #sleep_for = send_at - time.time() if i != 0 else 0
+            #print(i, sleep_for, "printing", countdown_message)
+            sleep_for = send_at - time.time()
+            await sleep(sleep_for)
+            send_at = time.time() + 1
+            await say(ctx, countdown_message)
         else:
             return
-    await sleep(1)
-    await bot.send_message(channel, go())
-
-@bot.command(pass_context=True)
-@commands.has_permissions(kick_members=True)
-async def blacklist(ctx, channel_name):
 
 
-
-async def reset_blacklist():
-
-
-
-
-@bot.command(pass_context=True)
-@commands.has_permissions(kick_members=True)
-async def list_channels(ctx):
-    """Tells you which channels on this server countdowns are allowed in. e.g. `@countdown list_channels`"""
-    this_channel = get_channel_name(ctx)
-    server_id = get_server_id(ctx)
-    if server_id in servers and len(servers[server_id]) > 0:
-        await bot.send_message(ctx.message.channel, "I'm allowed to run in {}.".format(readable_channel_list(server_id, servers)))
-    else:
-        await bot.send_message(ctx.message.channel, "I'm not allowed to run in any channels on {}.".format(ctx.message.server))
+async def exec():
+    print(exec(input()))
 
 
 @bot.command(pass_context=True)
 async def help(ctx):
-    await bot.send("placeholder help message. use a embed here")
+    await say(ctx, "placeholder help message. use a embed here")
 
 
-@bot.command(pass_context=True)
-@bot.event
-async def on_command_error(error, ctx):
-    """Prints errors if it's allowed; parses through errors to start/stop if possible."""
-    if check_if_allowed_channel(ctx, servers):
-        message = ctx.message.content.split(">", maxsplit=1)[1]
-        lowered = message.lower().strip()
-        message_parts = re.split("\s+", lowered)
-        if message_parts[0] == 'start':
-            if len(message_parts) < 2: # if no number was provided
-                await do_start(ctx, 10)
-                return
-            else:
-                await do_start(ctx, message_parts[1])
-                return
-        elif message_parts[0] == 'stop':
-            if ctx.message.author.id == userid:
-                await stop_counting()
-                return
-        else: # check is user tried to start a countdown without 'start'.
-            try:
-                await do_start(ctx, int(message_parts[0]))
-                return
-            except:
-                await bot.send_message(ctx.message.channel, "Not sure what you mean by '{}'.".format(message.strip()))
-    else:
-        print("Not allowed to print errors in {}: {}".format(str(ctx.message.channel), str(error)))
+# @bot.command(pass_context=True)
+# @bot.event
+# async def on_command_error(error, ctx):
+#     """Prints errors if it's allowed; parses through errors to start/stop if possible."""
+#     raise error
 
-@bot.command(pass_context=True)
-async def test(ctx):
-    pass
-
-token = None
-with open(os.path.join(root_dir, 'token.json')) as token_file: # get token from file
-    token = json.load(token_file)["token"]
+with open(token_file) as token_f: # get token from file
+    token = yaml.load(token_f, Loader=yaml.FullLoader)["token"]
 
 bot.run(token)

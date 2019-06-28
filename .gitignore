@@ -1,4 +1,5 @@
-token.json
+token.*
+!token.*.dist
 **/.DS_Store
 server.json
 *~

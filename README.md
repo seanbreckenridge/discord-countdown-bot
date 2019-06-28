@@ -24,9 +24,9 @@ cd discord-countdown-bot
 
 Requirements are listed in the [`Pipfile`](./Pipfile).
 
-_Token_ should be stored in a file named `token.json` in the root directory. See token.json.dist as an example.
+_Token_ should be stored in a file named `token.yaml` in the root directory. See token.yaml.dist as an example.
 
-Additional options can be configured in the [`config.yaml`](./config.yaml) file. (e.g. `countdown_min` and `countdown_min` for the allowed min/max countdown ranges.)
+# add env for countdown min max
 
 ### Usage:
 
