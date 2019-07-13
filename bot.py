@@ -294,19 +294,19 @@ async def on_command_error(ctx, error):
             return await ctx.channel.send("You are not allowed to run this command.")
 
     else:
-        traceback.print_exc()
+        raise error
 
 
 @bot.command()
 async def help(ctx):
     embed=Embed(title="Countdown Help", color=0x4eb1ff)
     embed.add_field(name="Basic Commands", value='\u200b', inline=False)
-    embed.add_field(name=f"@{bot.user.name} <n>", value="Start a countdown with length 'n'", inline=False)
-    embed.add_field(name=f"@{bot.user.name} stop", value="Stops the countdown in the current channel", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} <n>", value="Start a countdown with length 'n'", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} stop", value="Stops the countdown in the current channel", inline=False)
     embed.add_field(name="Configuration Commands (requires admin)", value='\u200b', inline=False)
-    embed.add_field(name=f"@{bot.user.name} status", value="Prints the current configuration status", inline=False)
-    embed.add_field(name=f"@{bot.user.name} role", value="Limits the bot usage to anyone with the `#` role.", inline=False)
-    embed.add_field(name=f"@{bot.user.name} bypass", value="Allows everyone to use the bot", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} status", value="Prints the current configuration status", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} role", value="Limits the bot usage to anyone with the `#` role.", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} bypass", value="Allows everyone to use the bot", inline=False)
     await ctx.channel.send(embed=embed)
 
 
