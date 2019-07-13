@@ -22,7 +22,7 @@ cd discord-countdown-bot
 pipenv install
 ```
 
-If you're not on python 3.6, use [`pyenv`](https://github.com/pyenv/pyenv) to install another version of python:
+If you're not on python 3.6 or above, use [`pyenv`](https://github.com/pyenv/pyenv) to install another version of python:
 
 ```
 pyenv install 3.6.8
