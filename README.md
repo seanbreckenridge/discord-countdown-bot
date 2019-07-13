@@ -47,4 +47,4 @@ COUNTDOWN_MAX=10 python3 bot.py
 
 `@countdown help` for:
 
-<img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/help.png" alt="botscreencaphelp" width=275>
+<img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/help.png" alt="botscreencaphelp" width=500>
