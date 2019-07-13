@@ -1,7 +1,7 @@
 token.*
 !token.*.dist
+server.db
 **/.DS_Store
-server.json
 *~
 **/__pycache__/
 **.py[cod]

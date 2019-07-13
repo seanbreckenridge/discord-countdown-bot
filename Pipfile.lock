@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c4d5ac568c411c4601ef6d42b5c13c8b1c29583af3e522c5dee32bf887e68533"
+            "sha256": "21fc0e7f2140fdf303e7f81f0ac489d6532a5e5a0a729c5a5899e99fb03e8498"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -118,6 +118,13 @@
                 "sha256:db603a1c235d110c860d5f39988ebc8218ee028f07a7cbc056ba6424372ca31b"
             ],
             "version": "==4.5.2"
+        },
+        "pickledb": {
+            "hashes": [
+                "sha256:ec6973e65d7d112849e78ce522840aa908efb2523470bb8ce5c7942310192240"
+            ],
+            "index": "pypi",
+            "version": "==0.9.2"
         },
         "pyyaml": {
             "hashes": [

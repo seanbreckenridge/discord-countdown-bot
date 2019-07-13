@@ -1,61 +1,50 @@
 # Countdown Bot
 
-A simple bot that counts down in numeric emojis.
+A discord bot to count down in numeric emojis.
 
 <img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/count.png" alt="botscreencap" width=275>
 
 ### Installation
 
-This bot requires very basic permissions when creating an bot account. Just 'Send Messages' is fine, this can be updated later.
+Required Permissions:
 
-If you're not on python 3.6, use [`pyenv`](https://github.com/pyenv/pyenv) to install another version of python:
+- Send Messages
+- Add Reactions
+- Manage Roles
 
-`pyenv install 3.6.8`
-`pipenv --python ~/.pyenv/versions/3.6.8/bin/python3.6`
+To add it to a server, use `https://discordapp.com/oauth2/authorize?&client_id=YOUR_CLIENT_ID_HERE&scope=bot&permissions=268437568`, replacing `YOUR_CLIENT_ID_HERE`. See [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token) for a tutorial on creating a discord bot account.
 
-This uses [`pipenv`](https://github.com/pypa/pipenv) to manage the environment; after:
+This uses [`pipenv`](https://github.com/pypa/pipenv) to manage the environment. To install:
 
 ```
 git clone https://github.com/seanbreckenridge/discord-countdown-bot
 cd discord-countdown-bot
+pipenv install
 ```
 
-... run `pipenv install` to create the virtual environment, and `pipenv shell` to enter it.
+If you're not on python 3.6, use [`pyenv`](https://github.com/pyenv/pyenv) to install another version of python:
 
-Requirements are listed in the [`Pipfile`](./Pipfile).
+```
+pyenv install 3.6.8
+pipenv --python ~/.pyenv/versions/3.6.8/bin/python3.6
+pipenv install
+```
 
-_Token_ should be stored in a file named `token.yaml` in the root directory. See token.yaml.dist as an example.
+To enter the virtual environment, use `pipenv shell`.
 
-# add env for countdown min max
+_Token_ should be stored in a file named `token.yaml` in the root directory. See [`token.yaml.dist`](./token.yaml.dist) as an example.
 
 ### Usage:
 
-`python3 bot.py` to start.
+`python3 bot.py` to run the bot.
 
-Assuming the bot's name is `@countdown`:
+You can overwrite the `COUNTDOWN_MIN`/`COUNTDOWN_MAX` (the minimum and maximum one can call countdowns for) by providing alternatives as environment variables:
 
-__Commands__
+```
+COUNTDOWN_MAX=20 COUNTDOWN_MIN=5 python3 bot.py
+COUNTDOWN_MAX=10 python3 bot.py
+```
 
-`start`: Starts a countdown from the entered number. e.g. `@countdown start 10`
+`@countdown help` for:
 
-You can also do `@countdown 10`, which implies `@countdown start 10`.
-
-`stop`: Stops the countdown. This can only be done if you started the countdown. e.g. `@countdown stop`
-
-`help`: Displays a help message. e.g. `@countdown help`
-
-__Moderator Commands__
-
-`allow`: Allows countdowns in a channel. e.g. `@countdown allow general`
-
-`disallow`: Disallows countdown in a channel. All channels are disallowed by default. e.g. `@countdown disallow general`
-
-`list_channels`: Tells you which channels on this server countdowns are allowed in. e.g. `@countdown list_channels`
-
-`purge_channel_list`: Purges the list of allowed channels. e.g. `@countdown purge_channel_list`
-
-`halt`: Stops the countdown disregarding who started it. e.g. `@countdown halt`
-
-`reset_rate_limits`: Resets rate limits for all users. e.g. `@countdown reset_rate_limits`
-
-By default, rate (number of times a user can start a countdown) is 5 times every 6 hours.
+<img src="https://raw.githubusercontent.com/seanbrecke/discord-countdown-bot/master/screencaps/help.png" alt="botscreencaphelp" width=275>
