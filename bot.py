@@ -1,15 +1,13 @@
 import os
 import re
-import sys
 import logging
 import time
 import random
-import traceback
 
 import pickledb
 import yaml
 
-from discord import Client, Embed
+from discord import Embed
 from asyncio import sleep
 from discord.ext import commands
 
