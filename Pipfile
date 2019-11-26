@@ -10,5 +10,3 @@ pyyaml = "*"
 pickledb = "*"
 discord-py = ">=1.2.3"
 
-[requires]
-python_version = "3.6"
