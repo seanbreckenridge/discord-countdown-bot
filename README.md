@@ -1,4 +1,4 @@
-t# Countdown Bot
+# Countdown Bot
 
 A discord bot to count down in numeric emojis.
 
