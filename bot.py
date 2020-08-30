@@ -249,9 +249,9 @@ async def time_cmd(ctx):
             now: datetime = datetime.now()
             seconds_since_countdown: int = int((now - last_run).total_seconds())
             if message is None:
-                message = await ctx.channel.send(f"Its been {format_duration(seconds_since_countdown)} since the countdown ended.")
+                message = await ctx.channel.send(f"It's been {format_duration(seconds_since_countdown)} since the countdown ended")
             else:
-                await message.edit(content=f"Its been {format_duration(seconds_since_countdown)} since the countdown ended.")
+                await message.edit(content=f"It's been {format_duration(seconds_since_countdown)} since the countdown ended")
             await sleep(2)
     else:
         return await ctx.channel.send("Couldn't find when a countdown was last run in this channel...")
