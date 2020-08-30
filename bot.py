@@ -3,6 +3,8 @@ import re
 import logging
 import time
 import random
+from datetime import datetime
+from typing import Dict
 
 import pickledb
 import yaml
@@ -57,9 +59,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
 log = logging.getLogger(__name__)
 
 # absolute filepaths
-root_dir = os.path.dirname(os.path.realpath(__file__)) # get directory of bot.py
-token_file = os.path.join(root_dir, 'token.yaml')
-server_file = os.path.join(root_dir, 'server.db')
+root_dir: str = os.path.dirname(os.path.realpath(__file__)) # get directory of bot.py
+token_file: str = os.path.join(root_dir, 'token.yaml')
+server_file: str = os.path.join(root_dir, 'server.db')
 server_db = pickledb.load(server_file, auto_dump=True)
 
 
@@ -76,10 +78,13 @@ go_messages = [":regional_indicator_g: :regional_indicator_o: :exclamation:",
                     ":space_invader:", ":crossed_swords:", ":movie_camera:"]
 
 # short countdown channel blacklist
-short_blacklist = ChannelBlacklist(logger=log, multiplication_factor=2)
+short_blacklist: ChannelBlacklist = ChannelBlacklist(logger=log, multiplication_factor=2)
 # e.g. if you start a countdown of length 10, you have to either wait till it
 # finishes or 10 * 2 seconds before starting a new one
 
+# in memory cache of when 'go' was last run in a channel. Used to facilitate
+# @countdown time command
+last_run_at: Dict[int, datetime] = {}
 
 #  start bot
 bot = commands.Bot(command_prefix=commands.when_mentioned, pm_help=None,
@@ -189,7 +194,7 @@ async def start(ctx, *count_from):
         await count(parsed[0], ctx)
         return short_blacklist.stop(ctx.channel.id)
     else: # wait for reactions
-        return await ctx.channel.send(f"This feature hasn't been added yet.")
+        return await ctx.channel.send("This feature hasn't been added yet.")
 
 
 async def count(num, ctx):
@@ -207,6 +212,8 @@ async def count(num, ctx):
             await sleep(sleep_for)
             send_at = time.time() + 1
             await ctx.channel.send(countdown_message)
+            # save when the go message was sent
+            last_run_at[ctx.channel.id] = datetime.now()
         else:
             return
 
@@ -223,6 +230,31 @@ async def stop(ctx):
     else:
         return await ctx.channel.send("Theres no countdown in this channel to stop.")
 
+# helper for formatting into HH:MM:SS
+def pad(i):
+    return str(i).zfill(2)
+
+def format_duration(seconds: int):
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return ":".join(map(pad, (hours, minutes, seconds,)))
+
+@bot.command(name="time")
+async def time_cmd(ctx):
+    """Prints how long its been since a 'go message' was sent in this chanel"""
+    if ctx.channel.id in last_run_at:
+        last_run: datetime = last_run_at[ctx.channel.id]
+        message = None
+        for i in range(15):
+            now: datetime = datetime.now()
+            seconds_since_countdown: int = int((now - last_run).total_seconds())
+            if message is None:
+                message = await ctx.channel.send(f"Its been {format_duration(seconds_since_countdown)} since the countdown ended.")
+            else:
+                await message.edit(content=f"Its been {format_duration(seconds_since_countdown)} since the countdown ended.")
+            await sleep(2)
+    else:
+        return await ctx.channel.send("Couldn't find when a countdown was last run in this channel...")
 
 @bot.command()
 @has_admin_privilege()
@@ -301,6 +333,7 @@ async def help(ctx):
     embed.add_field(name="Basic Commands", value='\u200b', inline=False)
     embed.add_field(name=f"@{ctx.guild.me.display_name} <n>", value="Start a countdown with length 'n'", inline=False)
     embed.add_field(name=f"@{ctx.guild.me.display_name} stop", value="Stops the countdown in the current channel", inline=False)
+    embed.add_field(name=f"@{ctx.guild.me.display_name} time", value="Amount of time since a countdown was run in this channel", inline=False)
     embed.add_field(name="Configuration Commands (requires admin)", value='\u200b', inline=False)
     embed.add_field(name=f"@{ctx.guild.me.display_name} status", value="Prints the current configuration status", inline=False)
     embed.add_field(name=f"@{ctx.guild.me.display_name} role", value="Limits the bot usage to anyone with the `#` role.", inline=False)
