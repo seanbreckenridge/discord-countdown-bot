@@ -17,7 +17,7 @@ class ChannelBlacklist:
     """Keeps track of which channels currently have countdowns.
     Channels should be removed from the dict once countdowns are finished,
     though API connection issues may prevent that, so they are automatically removed
-    after the length of the countdown has elapsed * multiplicaton_factor
+    after the length of the countdown has elapsed * multiplication_factor
     """
     def __init__(self, logger, multiplication_factor):
         self.channels = {} # contains currently blacklisted channels and unix time at which they should be removed
@@ -287,7 +287,7 @@ async def bypass(ctx):
         return await ctx.channel.send(f"Everyone on this server can already use {bot.user.mention}.")
     else:
         server_db.set(f"{ctx.guild.id}mode", "!")
-        return await ctx.channel.send(f"Bypassed sucessfully. Anyone on the server can start/stop countdowns. If you wish to limit the use of the bot, run \"{bot.user.mention} role\"")
+        return await ctx.channel.send(f"Bypassed successfully. Anyone on the server can start/stop countdowns. If you wish to limit the use of the bot, run \"{bot.user.mention} role\"")
 
 
 @bot.command()
@@ -316,7 +316,7 @@ async def on_command_error(ctx, error):
             log.info("Unknown command called: {}".format(message_parts))
             return await ctx.channel.send(f"That command doesn't exist. Run \"{bot.user.mention} help\" for a list.")
 
-        # if message parsed as countdown start sucessfully
+        # if message parsed as countdown start successfully
         message_parts.insert(1, "start")
         ctx.message.content = " ".join(message_parts)
         log.info("Invoking start from on_command_error with {} {}".format(message_parts, error))
