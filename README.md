@@ -17,7 +17,7 @@ To add it to a server, use `https://discordapp.com/oauth2/authorize?&client_id=Y
 This uses [`pipenv`](https://github.com/pypa/pipenv) to manage the environment. To install:
 
 ```
-git clone https://gitlab.com/seanbreckenridge/discord-countdown-bot
+git clone https://github.com/seanbreckenridge/discord-countdown-bot
 cd discord-countdown-bot
 pipenv install
 ```
