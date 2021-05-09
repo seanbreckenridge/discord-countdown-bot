@@ -9,7 +9,6 @@ A discord bot to count down in numeric emojis.
 Required Permissions:
 
 - Send Messages
-- Add Reactions
 - Manage Roles
 
 To add it to a server, use `https://discordapp.com/oauth2/authorize?&client_id=YOUR_CLIENT_ID_HERE&scope=bot&permissions=268437568`, replacing `YOUR_CLIENT_ID_HERE`. See [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token) for a tutorial on creating a discord bot account.
