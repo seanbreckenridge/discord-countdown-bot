@@ -8,5 +8,4 @@ verify_ssl = true
 [packages]
 pyyaml = "*"
 pickledb = "*"
-discord-py = ">=1.5.0"
-
+discord-py = "==2.0.1"
