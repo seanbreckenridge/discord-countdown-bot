@@ -9,7 +9,7 @@ from typing import Dict
 import pickledb
 import yaml
 
-from discord import Embed
+from discord import Embed, Intents
 from asyncio import sleep
 from discord.ext import commands
 
@@ -88,7 +88,7 @@ last_run_at: Dict[int, datetime] = {}
 
 #  start bot
 bot = commands.Bot(command_prefix=commands.when_mentioned, pm_help=None,
-                        case_insensitive=False)
+                        case_insensitive=False, intents=Intents.default())
 bot.remove_command('help') # remove default help
 
 
@@ -347,4 +347,4 @@ async def help(ctx):
 with open(token_file) as token_f: # get token from file
     token = yaml.load(token_f, Loader=yaml.FullLoader)["token"]
 
-bot.run(token, bot=True, reconnect=True)
+bot.run(token, reconnect=True)
