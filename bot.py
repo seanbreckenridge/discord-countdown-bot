@@ -51,7 +51,7 @@ class ChannelBlacklist:
         else:
             time_left = self.channels[channel_id] - int(time.time())
             self.logger.info(
-                f"Forbidden start: cant start another countdown in {channel_id} for another {time_left} seconds."
+                f"Forbidden start: can't start another countdown in {channel_id} for another {time_left} seconds."
             )
             # how long ago in seconds the countdown started
             raise RuntimeError(time_left)
@@ -266,7 +266,7 @@ async def count(num, ctx):
     ):
         if ctx.channel.id in short_blacklist.channels:
             # the 0.2 is a guess; for some reason the last message always seems to get delayed
-            # it may just be an artifact of the API status right now, but leaving this here incase
+            # it may just be an artifact of the API status right now, but leaving this here in case
             # its a predictable delay
             # sleep_for = send_at - time.time() if i != 0 else 0
             # print(i, sleep_for, "printing", countdown_message)
@@ -290,7 +290,7 @@ async def stop(ctx):
         short_blacklist.stop(ctx.channel.id)
         log.info(f"{ctx.author} stopped countdown in {ctx.channel.id}")
     else:
-        return await ctx.channel.send("Theres no countdown in this channel to stop.")
+        return await ctx.channel.send("There's no countdown in this channel to stop.")
 
 
 # helper for formatting into HH:MM:SS
@@ -315,7 +315,7 @@ def format_duration(seconds: int):
 
 @bot.command(name="time")
 async def time_cmd(ctx):
-    """Prints how long its been since a 'go message' was sent in this chanel"""
+    """Prints how long its been since a 'go message' was sent in this channel"""
     if ctx.channel.id in last_run_at:
         last_run: datetime = last_run_at[ctx.channel.id]
         message = None
@@ -351,7 +351,7 @@ async def role(ctx):
     server_db.set(f"{ctx.guild.id}mode", "#")
     if "#" in [r.name for r in ctx.guild.roles]:
         return await ctx.channel.send(
-            "The `#` role aleady exists. Anyone who has it can start/stop countdowns."
+            "The `#` role already exists. Anyone who has it can start/stop countdowns."
         )
     else:
         # check if bot has permissions to create roles
